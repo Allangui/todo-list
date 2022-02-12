@@ -245,6 +245,9 @@ body {
       }
     }
     .mainCard{
+-webkit-box-shadow: -3px 9px 50px 2px rgba(0,0,0,0.1); 
+box-shadow: -3px 9px 50px 2px rgba(0,0,0,0.1);
+
       .draggable{
         .itemList{
           &:first-child{
@@ -344,6 +347,8 @@ body {
       justify-content: center;
       column-gap: 25px;
       font-size: 1rem;
+      -webkit-box-shadow: -3px 9px 50px 2px rgba(0,0,0,0.1); 
+      box-shadow: -3px 9px 50px 2px rgba(0,0,0,0.1);
       span{
         cursor: pointer;
         &:hover{
