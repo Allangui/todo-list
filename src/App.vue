@@ -1,17 +1,17 @@
 <template>
-  <div id="main">
-    <div class="header">
+  <main>
+    <header>
       <h1>todo</h1>
       <svg xmlns="http://www.w3.org/2000/svg" v-if="!lightMode" @click="toggleMode()" width="26" height="26"><path fill="#FFF" fill-rule="evenodd" d="M13 21a1 1 0 011 1v3a1 1 0 11-2 0v-3a1 1 0 011-1zm-5.657-2.343a1 1 0 010 1.414l-2.121 2.121a1 1 0 01-1.414-1.414l2.12-2.121a1 1 0 011.415 0zm12.728 0l2.121 2.121a1 1 0 01-1.414 1.414l-2.121-2.12a1 1 0 011.414-1.415zM13 8a5 5 0 110 10 5 5 0 010-10zm12 4a1 1 0 110 2h-3a1 1 0 110-2h3zM4 12a1 1 0 110 2H1a1 1 0 110-2h3zm18.192-8.192a1 1 0 010 1.414l-2.12 2.121a1 1 0 01-1.415-1.414l2.121-2.121a1 1 0 011.414 0zm-16.97 0l2.121 2.12A1 1 0 015.93 7.344L3.808 5.222a1 1 0 011.414-1.414zM13 0a1 1 0 011 1v3a1 1 0 11-2 0V1a1 1 0 011-1z"/></svg>
       <svg xmlns="http://www.w3.org/2000/svg" v-else @click="toggleMode()" width="26" height="26"><path fill="#FFF" fill-rule="evenodd" d="M13 0c.81 0 1.603.074 2.373.216C10.593 1.199 7 5.43 7 10.5 7 16.299 11.701 21 17.5 21c2.996 0 5.7-1.255 7.613-3.268C23.22 22.572 18.51 26 13 26 5.82 26 0 20.18 0 13S5.82 0 13 0z"/></svg>
-    </div>
+    </header>
     <div class="card">
       <div class="topCard">
-        <input type="checkbox" id="newTodo" name="newTodo" @click="addNewTodo()">
-        <label for="newTodo"><input type="text" id="textNewTodo" @keyup.enter="addNewTodo()" v-model="theNewTodo" name="textNewTodo" placeholder="Create a new todo..."></label>
+        <input type="checkbox" id="newTodo" name="newTodo" @click="addNewTodo()"  >
+        <label for="newTodo"><input type="text" id="textNewTodo" @keyup.enter="addNewTodo()" v-model="theNewTodo" name="textNewTodo" placeholder="Create a new todo..." ></label>
       </div>
       <div class="mainCard">
-          <draggable class="draggable" :list="todos" @start="test($event)">
+          <draggable class="draggable" :list="todos">
             <div class="itemList" v-for="(todo,index) in todos" :key="todo.id" v-show="showFilter(todo)" >
             <input type="checkbox" class="todo todoIsDone" @change="todoLeftFunc(index)" v-model="todo.checked" name="todo">
             <label for="todo" @click="todo.checked? todo.checked=false : todo.checked=true, todoLeftFunc(index)"  >{{ todo.content  }}</label>
@@ -33,7 +33,7 @@
       </div>
     </div>
     <span class="textDrag">Drag and drop to reorder list</span>
-  </div>
+  </main>
 </template>
 
 <script >
@@ -54,7 +54,7 @@ export default{
   },
   methods: {
     addNewTodo() {
-      if (this.theNewTodo.length >0){
+      if (this.theNewTodo.length >0 && !this.theNewTodo.includes(' ',0)){
       this.todos.unshift({content:this.theNewTodo, checked:false})
       this.theNewTodo = ''
       this.itemsLeft += 1
@@ -135,17 +135,16 @@ export default{
         document.documentElement.style.setProperty('--fontHover', 'hsl(236, 33%, 92%)')
       }
     },
-    test(event){
-      console.log('test',event)
-      
-    }
-  }
+  },
+  mounted () {
+    window.setTimeout(() => {
+      this.body.style.transition= "background-color .5s,background-image .5s,color .5s"
+    }, 100);
+  },
 }
 </script>
 <style lang="scss">
 :root{
-  --bgImgMobile:url(../src/assets/bg-mobile-dark.jpg);
-  --bgImgDesk:url(../src/assets/bg-desktop-dark.jpg);
   --bgColor:hsl(235, 21%, 11%);
   --bgTodo:hsl(235, 24%, 19%);
   --fontColor:hsl(234, 39%, 85%);
@@ -168,10 +167,11 @@ body {
   background-color: var(--bgColor);
   font-family: 'Josefin Sans', sans-serif;
   color:var(--fontColor);
-  #app{
 
+  #app{
     max-width: 85vw;
     margin:50px auto;
+    
   }
   input{
     outline: none;
@@ -190,10 +190,10 @@ body {
 <style scoped lang="scss">
 
 
-#main{
+main{
   max-width:500px;
   margin:0 auto;
-    .header{
+    header{
     display: flex;
     justify-content: space-between;
     margin-bottom: 30px;
@@ -217,6 +217,7 @@ body {
       display: flex;
       align-items: center;
       margin-bottom: 20px;
+      transition: color .5s,background-color .5s,border .5s;
         #newTodo{
           -webkit-appearance: none;
           -moz-appearance: none;
@@ -227,6 +228,7 @@ body {
           border-radius: 50%;
           background-color: transparent;
           cursor: pointer;
+          transition: color .5s,background-color .5s,border .5s;
         }
 
         label{
@@ -250,6 +252,7 @@ box-shadow: -3px 9px 50px 2px rgba(0,0,0,0.1);
 
       .draggable{
         .itemList{
+          transition: color .5s,background-color .5s,border .5s;
           &:first-child{
             border-top-right-radius: 5px;
             border-top-left-radius: 5px;
@@ -273,8 +276,7 @@ box-shadow: -3px 9px 50px 2px rgba(0,0,0,0.1);
           border-radius: 50%;
           background-color: transparent;
           cursor: pointer;
-          
-          
+          transition: color .5s,background-color .5s,border .5s;
           }
           .todo:checked{
           background: linear-gradient(hsl(192, 100%, 67%) , hsl(280, 87%, 65%));
@@ -322,6 +324,7 @@ box-shadow: -3px 9px 50px 2px rgba(0,0,0,0.1);
           align-items: center;
           justify-content: space-between;
           font-size: 1rem;
+          transition: color .5s,background-color .5s,border .5s;
           
           .displayNoneMobile{
             display: none;
@@ -349,6 +352,7 @@ box-shadow: -3px 9px 50px 2px rgba(0,0,0,0.1);
       font-size: 1rem;
       -webkit-box-shadow: -3px 9px 50px 2px rgba(0,0,0,0.1); 
       box-shadow: -3px 9px 50px 2px rgba(0,0,0,0.1);
+      transition: color .5s,background-color .5s,border .5s;
       span{
         cursor: pointer;
         &:hover{
@@ -365,6 +369,7 @@ box-shadow: -3px 9px 50px 2px rgba(0,0,0,0.1);
         display: inline-block;
         margin-top:50px;
         width: 100%;
+        transition: color .5s;
       }
 }
 @media only screen and (min-width: 700px) {
