@@ -11,26 +11,37 @@
         <label for="newTodo"><input type="text" id="textNewTodo" @keyup.enter="addNewTodo()" v-model="theNewTodo" name="textNewTodo" placeholder="Create a new todo..."></label>
       </div>
       <div class="mainCard">
-        <ul>
-          <li v-for="(todo, index) in todos" :key="todo.id" v-show="showFilter(todo)">
+          <draggable class="draggable" :list="todos" @start="test($event)">
+            <div class="itemList" v-for="(todo,index) in todos" :key="todo.id" v-show="showFilter(todo)" >
             <input type="checkbox" class="todo todoIsDone" @change="todoLeftFunc(index)" v-model="todo.checked" name="todo">
             <label for="todo" @click="todo.checked? todo.checked=false : todo.checked=true, todoLeftFunc(index)"  >{{ todo.content  }}</label>
             <svg @click="deleteTodo(index)" xmlns="http://www.w3.org/2000/svg" width="18" height="18"><path fill="#494C6B" fill-rule="evenodd" d="M16.97 0l.708.707L9.546 8.84l8.132 8.132-.707.707-8.132-8.132-8.132 8.132L0 16.97l8.132-8.132L0 .707.707 0 8.84 8.132 16.971 0z"/></svg>
-          </li>
-          <li><span>{{ itemsLeft }} items left</span><span @click="clearCompleted()">Clear completed</span></li>
-        </ul>
+            </div>
+            </draggable>
+            <div class="lastItemList">
+              <span class="left">{{ itemsLeft }} items left</span>
+              <span class="all displayNoneMobile" :class="{isActive: whichFilter==='all'}" @click="filter('all')">All</span>
+              <span class="active displayNoneMobile" :class="{isActive: whichFilter==='active'}" @click="filter('active')">Active</span>
+              <span class="completed displayNoneMobile" :class="{isActive: whichFilter==='completed'}" @click="filter('completed')">Completed</span>
+              <span @click="clearCompleted()" class="clearCompleted">Clear completed</span>
+            </div>
       </div>
-      <div class="bottomCard">
+      <div class="bottomCard displayNoneDesk">
         <span class="all" :class="{isActive: whichFilter==='all'}" @click="filter('all')">All</span>
         <span class="active" :class="{isActive: whichFilter==='active'}" @click="filter('active')">Active</span>
         <span class="completed" :class="{isActive: whichFilter==='completed'}" @click="filter('completed')">Completed</span>
       </div>
     </div>
+    <span class="textDrag">Drag and drop to reorder list</span>
   </div>
 </template>
 
 <script >
+import { VueDraggableNext } from 'vue-draggable-next'
 export default{
+    components: {
+        draggable: VueDraggableNext,
+      },
     data() {
       return {
         todos: [],
@@ -111,6 +122,7 @@ export default{
         document.documentElement.style.setProperty('--borderColor', 'hsl(236, 33%, 92%)')
         document.documentElement.style.setProperty('--fontComplete', 'hsl(233, 11%, 84%)')
         document.documentElement.style.setProperty('--fontLight', 'hsl(236, 9%, 61%)')
+        document.documentElement.style.setProperty('--fontHover', 'hsl(235, 19%, 35%)')
       } else  {
         this.lightMode = false
         document.body.classList.replace('BGlight','BGdark')
@@ -120,9 +132,14 @@ export default{
         document.documentElement.style.setProperty('--borderColor', 'hsl(237, 14%, 26%)')
         document.documentElement.style.setProperty('--fontComplete', 'hsl(233, 14%, 35%)')
         document.documentElement.style.setProperty('--fontLight', 'hsl(233, 14%, 35%)')
+        document.documentElement.style.setProperty('--fontHover', 'hsl(236, 33%, 92%)')
       }
+    },
+    test(event){
+      console.log('test',event)
+      
     }
-  },
+  }
 }
 </script>
 <style lang="scss">
@@ -135,6 +152,7 @@ export default{
   --borderColor:hsl(237, 14%, 26%);
   --fontComplete:hsl(233, 14%, 35%);
   --fontLight:hsl(233, 14%, 35%);
+  --fontHover:hsl(236, 33%, 92%);
 }
 .BGlight{
 background-image: url(../src/assets/bg-mobile-light.jpg);
@@ -173,7 +191,7 @@ body {
 
 
 #main{
-  max-width:600px;
+  max-width:500px;
   margin:0 auto;
     .header{
     display: flex;
@@ -227,30 +245,21 @@ body {
       }
     }
     .mainCard{
-      ul{
-        li{
-            &:first-child{
-              border-top-right-radius: 5px;
-              border-top-left-radius: 5px;
-            }
-            width:100%;
-            background-color: var(--bgTodo);
-            padding:15px;
-            border-bottom:solid 1px var(--borderColor);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 1rem;
-
-            &:last-child{
-              color:var(--fontLight);
-              border:none;
-              border-bottom-left-radius: 5px;
-              border-bottom-right-radius: 5px;
-              padding:20px;
-              cursor: pointer;
-              
-            }
+      .draggable{
+        .itemList{
+          &:first-child{
+            border-top-right-radius: 5px;
+            border-top-left-radius: 5px;
+          }
+          width:100%;
+          background-color: var(--bgTodo);
+          padding:10px 15px;
+          border-bottom:solid 1px var(--borderColor);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          font-size: 1rem;
+          } 
           .todo{
           -webkit-appearance: none;
           -moz-appearance: none;
@@ -285,6 +294,7 @@ body {
           margin-left:5px;
           font-size: 0.9rem;
           width:80%;
+          padding:10px 0;
           cursor: pointer;
           }
           svg{
@@ -293,10 +303,34 @@ body {
           .todoIsDone:checked + label{
             text-decoration:line-through;
             color:var(--fontComplete);
+            }
           }
         }
-      }
-    }
+        .lastItemList{
+          color:var(--fontLight);
+          border:none;
+          border-bottom-left-radius: 5px;
+          border-bottom-right-radius: 5px;
+          
+          width:100%;
+          background-color: var(--bgTodo);
+          padding: 15px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          font-size: 1rem;
+          
+          .displayNoneMobile{
+            display: none;
+          }
+          .clearCompleted{
+            cursor: pointer;
+            &:hover{
+              color:var(--fontHover)
+            }
+          }
+        }
+    
     .bottomCard{
       width:100%;
       margin-top:20px;
@@ -312,13 +346,54 @@ body {
       font-size: 1rem;
       span{
         cursor: pointer;
+        &:hover{
+          color:var(--fontHover);
+        }
       }
       .isActive{
-        color:hsl(220, 98%, 61%);
+        color:hsl(220, 98%, 61%)!important;
       }
     }
+      .textDrag{
+        color:var(--fontComplete);
+        text-align: center;
+        display: inline-block;
+        margin-top:50px;
+        width: 100%;
+      }
 }
-
+@media only screen and (min-width: 700px) {
+  .displayNoneMobile{
+    display:block !important;
+  }
+.displayNoneDesk{
+  display: none !important;
+}
+.mainCard{
+  .lastItemList{
+    font-size: .9rem !important;
+      .isActive{
+        color:hsl(220, 98%, 61%)!important;
+      }
+      .left{
+        margin-right:40px;
+      }
+        .all,.active,.completed{
+        cursor: pointer;
+        &:hover{
+          color:var(--fontHover);
+        }
+      }
+      .clearCompleted{
+        cursor: pointer;
+        margin-left:30px;
+        &:hover{
+          color:var(--fontHover);
+        }
+      }
+    }
+  }
+}
 </style>
 
 
